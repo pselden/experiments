@@ -12,7 +12,7 @@ swig(app, {
     ext: 'swig.html'
 });
 
-app.use(statics('src/assets'));
+app.use(statics('dist/assets'));
 
 app.use(router(app));
 
