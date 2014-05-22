@@ -2,8 +2,59 @@
 
 {% block title %}Home{% endblock %}
 
-{% block content %}
-<div id="content"></div>
+{% block head %}
+<script type="text/javascript">
+    var _async = window._async || [];
+    _async.push(['doSomethingCool', 1, '2']);
+    _async.push(['add', 1, 2, 3]);
+</script>
 {% endblock %}
 
-{% block js %}{% endblock %}
+{% block content %}
+<div id="content">
+
+</div>
+<button onclick="_async.push(['add', 4, 5, 6])">Click</button>
+{% endblock %}
+
+{% block js %}
+    <script type="text/javascript">
+
+        setTimeout(function(){
+            function A(){
+                this.doSomethingCool = function(){
+                    alert('something really cool');
+                }
+
+                this.add = function(a, b, c){
+                    alert('add up all your shit: ' + (a + b + c));
+                }
+            }
+
+            var async = new A();
+
+            var AsyncQueue = function () {
+                this.push = function () {
+                    for (var i = 0; i < arguments.length; i++) try {
+                        if (typeof arguments[i] === "function") arguments[i]();
+                        else {
+                            async[arguments[i][0]].apply(async, arguments[i].slice(1));
+                            // get tracker function from arguments[i][0]
+                            // get tracker function arguments from arguments[i].slice(1)
+                            // call it!  trackers[arguments[i][0]].apply(trackers, arguments[i].slice(1));
+                        }
+                    } catch (e) {}
+                }
+            };
+
+            // get the existing _gaq array
+            var _old_async = window._async;
+
+            // create a new _gaq object
+            window._async = new AsyncQueue();
+
+            // execute all of the queued up events - apply() turns the array entries into individual arguments
+            window._async.push.apply(window._async, _old_async);
+        }, 10000);
+    </script>
+{% endblock %}
